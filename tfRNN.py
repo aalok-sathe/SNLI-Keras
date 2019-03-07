@@ -74,6 +74,11 @@ class AttentionAlignmentModel:
       trn = json.loads(open('RTE_train.json', 'r').read())
       vld = json.loads(open('RTE_valid.json', 'r').read())
       tst = json.loads(open('RTE_test.json', 'r').read())
+    elif self.dataset == 'wikinli':
+      trn = None
+      vld = None
+      tst = None
+      raise NotImplementedError('pending implementation; coming soon')
     else:
       raise ValueError('Unknwon Dataset')
 
