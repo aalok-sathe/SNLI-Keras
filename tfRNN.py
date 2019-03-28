@@ -41,7 +41,7 @@ def time_count(fn):
 
 class AttentionAlignmentModel:
 
-  def __init__(self, annotation ='biGRU', dataset = 'snli'):
+  def __init__(self, annotation ='biGRU', dataset = 'wikinli'):
     # 1, Set Basic Model Parameters
     self.Layers = 1
     self.EmbeddingSize = 300
@@ -75,27 +75,28 @@ class AttentionAlignmentModel:
       vld = json.loads(open('RTE_valid.json', 'r').read())
       tst = json.loads(open('RTE_test.json', 'r').read())
     elif self.dataset == 'wikinli':
-      trn = None
-      vld = None
-      tst = None
-      raise NotImplementedError('pending implementation; coming soon')
+      trn = json.loads(open('db_2_pos-neg_train.json', 'r').read())
+      vld = json.loads(open('db_2_pos-neg_valid.json', 'r').read())
+      tst = json.loads(open('db_2_pos-neg_test.json', 'r').read())
+      
+      # raise NotImplementedError('implementation pending; coming soon')
     else:
       raise ValueError('Unknwon Dataset')
 
-    trn[2] = np_utils.to_categorical(trn[2], 3 if self.dataset == 'snli' else 2)
-    vld[2] = np_utils.to_categorical(vld[2], 3 if self.dataset == 'snli' else 2)
-    tst[2] = np_utils.to_categorical(tst[2], 3 if self.dataset == 'snli' else 2)
+    trn[1] = np_utils.to_categorical(trn[1], 3 if self.dataset == 'snli' else 2)
+    vld[1] = np_utils.to_categorical(vld[1], 3 if self.dataset == 'snli' else 2)
+    tst[1] = np_utils.to_categorical(tst[1], 3 if self.dataset == 'snli' else 2)
 
     return trn, vld, tst
 
   @time_count
   def prep_data(self):
     # 1, Read raw Training,Validation and Test data
-    self.train,self.validation,self.test = self.load_data()
+    self.train, self.validation, self.test = self.load_data()
 
     # 2, Prep Word Indexer: assign each word a number
     self.indexer = Tokenizer(lower=False, filters='')
-    self.indexer.fit_on_texts(self.train[0] + self.train[1]) # todo remove test
+    self.indexer.fit_on_texts(self.train[0])# + self.train[1]) # todo remove test
     self.Vocab = len(self.indexer.word_counts) + 1
 
     # 3, Convert each word in sent to num and zero pad
@@ -443,7 +444,7 @@ class AttentionAlignmentModel:
 
 
 if __name__ == '__main__':
-  md = AttentionAlignmentModel(annotation='EAM', dataset='snli')
+  md = AttentionAlignmentModel(annotation='EAM', dataset='wikinli')
   md.prep_data()
   md.prep_embd()
   _test = False
